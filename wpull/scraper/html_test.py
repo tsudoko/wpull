@@ -1,3 +1,4 @@
+import importlib
 import os.path
 import shutil
 import sys
@@ -518,6 +519,29 @@ class Mixin(object):
             },
             linked_urls
         )
+
+    def test_html_srcset(self):
+        element_walker = ElementWalker(
+            css_scraper=CSSScraper(), javascript_scraper=JavaScriptScraper())
+
+        testfile = os.path.join(ROOT_PATH, 'testing', 'samples', 'srcset.py')
+        spec = importlib.util.spec_from_file_location('srcset', testfile)
+        t = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(t)
+
+        for srcset, expected in t.strict_tests.items():
+            parsed = set(x for _, x in element_walker.iter_links_by_srcset_attrib("srcset", srcset))
+            if expected:
+                self.assertEqual({expected}, parsed)
+            else:
+                self.assertFalse(parsed)
+
+        for srcset, expected in t.tests.items():
+            parsed = set(x for _, x in element_walker.iter_links_by_srcset_attrib("srcset", srcset))
+            if expected:
+                # we don't mind getting some strictly invalid links here
+                # as long as the valid ones still get extracted correctly
+                self.assertIn(expected, parsed)
 
 
 @unittest.skipIf(IS_PYPY, 'Not supported under PyPy')

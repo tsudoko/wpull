@@ -1,0 +1,50 @@
+# taken from https://raw.githubusercontent.com/web-platform-tests/wpt/704d739c5a54658e6ea09efaa76824b134b36504/html/semantics/embedded-content/the-img-element/srcset/parse-a-srcset-attribute.html
+
+strict_tests = {
+    # splitting loop
+    r'': r'',
+    r',': r'',
+    r',,,': r'',
+    r'  data:,a  1x  ': r'data:,a',
+    '\x09\x09data:,a\x09\x091x\x09\x09': r'data:,a',
+    '\x0A\x0Adata:,a\x0A\x0A1x\x0A\x0A': r'data:,a',
+    '\x0B\x0Bdata:,a\x0B\x0B1x\x0B\x0B': '\x0B\x0Bdata:,a\x0B\x0B1x\x0B\x0B',
+    '\x0C\x0Cdata:,a\x0C\x0C1x\x0C\x0C': r'data:,a',
+    '\x0D\x0Ddata:,a\x0D\x0D1x\x0D\x0D': r'data:,a',
+    '\x0E\x0Edata:,a\x0E\x0E1x\x0E\x0E': '\x0E\x0Edata:,a\x0E\x0E1x\x0E\x0E',
+    '\x0F\x0Fdata:,a\x0F\x0F1x\x0F\x0F': '\x0F\x0Fdata:,a\x0F\x0F1x\x0F\x0F',
+    '\x10\x10data:,a\x10\x101x\x10\x10': '\x10\x10data:,a\x10\x101x\x10\x10',
+    r'data:,a': r'data:,a',
+    r'data:,a ': r'data:,a',
+    r'data:,a ,': r'data:,a',
+    r'data:,a,': r'data:,a',
+    r'data:,a, ': r'data:,a',
+    r'data:,a,,,': r'data:,a',
+    r'data:,a,, , ': r'data:,a',
+    r' data:,a': r'data:,a',
+    r',,,data:,a': r'data:,a',
+    r' , ,,data:,a': r'data:,a',
+    r'&nbsp;data:,a': r'&nbsp;data:,a',
+    r'data:,a&nbsp;': r'data:,a&nbsp;',
+}
+
+tests = {
+    # descriptor tokenizer
+    r'data:,a 1x': r'data:,a',
+    r'data:,a 1x ': r'data:,a',
+    r'data:,a 1x,': r'data:,a',
+    r'data:,a ( , data:,b 1x, ), data:,c': r'data:,c',
+    r'data:,a ((( , data:,b 1x, ), data:,c': r'data:,c',
+    r'data:,a [ , data:,b 1x, ], data:,c': r'data:,b',
+    r'data:,a { , data:,b 1x, }, data:,c': r'data:,b',
+    r'data:,a " , data:,b 1x, ", data:,c': r'data:,b',
+    r'data:,a \,data:;\,b, data:,c': r'data:;\,b',
+    r'data:,a, data:,b (': r'data:,a',
+    r'data:,a, data:,b (  ': r'data:,a',
+    r'data:,a, data:,b (,': r'data:,a',
+    r'data:,a, data:,b (x': r'data:,a',
+    r'data:,a, data:,b ()': r'data:,a',
+    r'data:,a (, data:,b': r'',
+    r'data:,a /*, data:,b, data:,c */': r'data:,b',
+    r'data:,a //, data:,b': r'data:,b',
+}

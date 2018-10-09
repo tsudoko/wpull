@@ -629,13 +629,37 @@ class ElementWalker(object):
         for link in links:
             yield attrib_name, link
 
+    ASCII_SPACE = "\u0020\u0009\u000a\u000c\u000d"
+    SRCSET_OUTSIDE = 0
+    SRCSET_URL = 1
+    SRCSET_DESCRIPTOR = 2
+
     @classmethod
     def iter_links_by_srcset_attrib(cls, attrib_name, attrib_value):
-        images = attrib_value.split(',')
-        links = [value.lstrip().split(' ', 1)[0] for value in images]
+        state = cls.SRCSET_OUTSIDE
+        _link = []
 
-        for link in links:
-            yield attrib_name, link
+        for c in attrib_value:
+            if state == cls.SRCSET_OUTSIDE and c not in cls.ASCII_SPACE:
+                if c == ',':  # stray comma
+                    continue
+                _link.append(c)
+                state = cls.SRCSET_URL
+            elif state == cls.SRCSET_URL:
+                if c in cls.ASCII_SPACE:
+                    if len(_link) >= 1 and _link[-1] == ',':  # no descriptor
+                        state = cls.SRCSET_OUTSIDE
+                    else:
+                        state = cls.SRCSET_DESCRIPTOR
+                    yield attrib_name, ''.join(_link).rstrip(',')
+                    _link = []
+                else:
+                    _link.append(c)
+            elif state == cls.SRCSET_DESCRIPTOR and c == ',':
+                state = cls.SRCSET_OUTSIDE
+
+        if _link:
+            yield attrib_name, ''.join(_link).rstrip(",")
 
     @classmethod
     def is_link_inline(cls, tag, attribute):
