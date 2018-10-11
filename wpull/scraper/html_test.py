@@ -78,6 +78,7 @@ class Mixin(object):
             'http://example.com/img_srcset_1.jpeg',
             'http://example.com/img_srcset_2.jpeg',
             'http://example.com/img_srcset_3.jpeg',
+            'http://example.com/img_srcset_,.jpeg',
             'http://example.com/input_src.png',
             'http://example.com/layer_src.png',
             'http://example.com/object/',  # returned by lxml
